@@ -57,7 +57,33 @@ export default {
             this.$refs.form.validate(valid => {
                 if (valid) {
                     // 提交表单登录
-                    
+                    this.$axios({
+                        url: "/login",
+                        method: "POST",
+                        data: this.form
+                    }).then(res => {
+                        // data是用户的数据，里面包含了token和user的详细信息
+                        const {data} = res.data;
+
+                        // 判断当前用户是否有权限
+                        if(data.user.role.type !== "admin"){
+                            this.$message({
+                                message: '当前用户没有权限,必须是管理员',
+                                type: 'warning'
+                            });
+                            return;
+                        }
+
+                        // 转换成字符串
+                        const userStr = JSON.stringify(data);
+                        // 保存到本地，可以给其他的组件使用
+                        localStorage.setItem("userInfo", userStr);
+                        // 登录成功的提示
+                        this.$message({
+                            message: '登录成功',
+                            type: 'success'
+                        });
+                    })
                 }
             });
         }
