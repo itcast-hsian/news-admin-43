@@ -1,10 +1,8 @@
 <template>
-  <div id="app">
-    首页
-    <el-button type="primary">主要按钮</el-button>
-  </div>
+    <div id="app">
+        <router-view></router-view>
+    </div>
 </template>
 
 <style lang="less">
-
 </style>
