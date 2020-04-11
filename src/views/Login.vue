@@ -1,11 +1,12 @@
 <template>
     <div class="container">
         <!-- model: 表示声明当前表单的数据对象（这个表单最终的数据存放到data的form对象里面） -->
-        <el-form :model="form" label-width="80px" class="form">
-            <el-form-item label="账号">
+        <!-- :rules: 表示声明当前表单的验证规则 -->
+        <el-form ref="form" :model="form" label-width="80px" :rules="rules" class="form">
+            <el-form-item label="账号" prop="username">
                 <el-input v-model="form.username"></el-input>
             </el-form-item>
-            <el-form-item label="密码">
+            <el-form-item label="密码" prop="password">
                 <el-input v-model="form.password" type="password"></el-input>
             </el-form-item>
             <el-form-item>
@@ -24,26 +25,54 @@ export default {
             form: {
                 username: "",
                 password: ""
+            },
+            // 表单的验证规则
+            // required: 表示必填
+            // message: 错误时候提示
+            // trigger 什么时候触发验证
+            rules: {
+                username: [
+                    {
+                        required: true,
+                        message: "请输入手机号码",
+                        trigger: "blur"
+                    },
+                    {
+                        min: 11,
+                        max: 11,
+                        message: "手机号码格式错误",
+                        trigger: "blur"
+                    }
+                ],
+                password: [
+                    { required: true, message: "请输入密码", trigger: "blur" }
+                ]
             }
         };
     },
     methods: {
         onSubmit() {
-            // 提交登录请求
-            console.log("submit!");
+            // 找到表单，表单下面有一个validate方法可以校验表单的验证是否全部通过
+            // 如果通过valid的值是true。反之就是false
+            this.$refs.form.validate(valid => {
+                if (valid) {
+                    // 提交表单登录
+                    
+                }
+            });
         }
     }
 };
 </script>
 
 <style scoped lang="less">
-.container{
+.container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh; // 屏幕高度可以看做是100个vh,相当于高度100%
 
-    .form{
+    .form {
         width: 450px;
     }
 }
