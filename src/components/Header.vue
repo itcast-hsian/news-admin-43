@@ -2,7 +2,9 @@
     <div class="header">
         <!-- logo -->
         <div class="logo">
-            <span class="iconfont iconnew"></span>
+            <router-link to="/">
+                <span class="iconfont iconnew"></span>
+            </router-link>
         </div>
 
         <!-- 使用下拉菜单组件使用下拉的退出按钮 -->
@@ -18,14 +20,29 @@
             </span>
             <el-dropdown-menu slot="dropdown">
                 <!-- 点击该可以退出登录 -->
-                <el-dropdown-item icon="el-icon-delete">退出</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-delete" @click.native="handleLogout">退出</el-dropdown-item>
             </el-dropdown-menu>
         </el-dropdown>
     </div>
 </template>
 
 <script>
-export default {};
+export default {
+    methods: {
+        // 退出登录方法
+        handleLogout(){
+            // 清除本地存储的用户详情数据
+            localStorage.removeItem("userInfo");
+            // 提示 
+            this.$message({
+                message: "退出成功",
+                type: "success"
+            });
+            // 退出后应该回到登录页
+            this.$router.replace("/login")
+        }
+    }
+};
 </script>
 
 <style scoped lang="less">
@@ -59,11 +76,16 @@ export default {};
     }
 }
 
+.el-dropdown{
+    height: 60px;
+}
+
 .el-dropdown-link {
     cursor: pointer;
     color: #409eff;
     display: flex;
     align-items: center;
+    height: 60px;
 }
 .el-icon-arrow-down {
     font-size: 12px;
