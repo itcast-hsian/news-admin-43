@@ -64,27 +64,38 @@ export default {
         };
     },
     mounted() {
-        // 请求文章列表
-        this.$axios({
-            url: "/post",
-            params: {
-                pageIndex: 1,
-                pageSize: 5,
-                category: 999 // 这个是固定，因为头条栏目会返回所有的文章
-            }
-        }).then(res => {
-            // data是文章的列表数据
-            const { data } = res.data;
-            // 保存数据到data
-            this.tableData = data;
-        });
+        this.getList();
     },
     methods: {
+		// 封装一个请求的方法
+		getList(){
+			this.$axios({
+				url: "/post",
+				params: {
+					pageIndex: this.pageIndex,
+					pageSize: this.pageSize,
+					category: 999
+				}
+			}).then(res => {
+				// data是文章的列表数据
+				const { data, total } = res.data;
+				// 保存数据到data
+				this.tableData = data;
+				this.total = total;
+			})
+		},
         handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
-        },
+			// 修改条数
+			this.pageSize = val;
+			// 重新请求接口
+			this.getList();
+		},
+		// 页数,val是当前的页数
         handleCurrentChange(val) {
-            console.log(`当前页: ${val}`);
+			// 修改页数
+			this.pageIndex = val;
+			// 重新请求接口
+			this.getList();
         }
     }
 };
