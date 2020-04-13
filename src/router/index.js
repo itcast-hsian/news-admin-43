@@ -6,7 +6,19 @@ Vue.use(VueRouter)
 const routes = [
 	{
 		path: "/",
-		component: () => import("@/views/Index.vue")
+		component: () => import("@/views/Index.vue"),
+		children: [
+			// 文章列表
+			{
+				path: "post-list",
+				component: () => import("@/views/PostList.vue")
+			},
+			// 发布文章
+			{
+				path: "new-post",
+				component: () => import("@/views/NewPost.vue")
+			}
+		]
 	},
 	{
 		path: "/login",

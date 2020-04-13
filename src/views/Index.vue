@@ -10,7 +10,10 @@
                 <!-- 侧边栏组件 -->
                 <Aside/>
             </el-aside>
-            <el-main>Main</el-main>
+            <el-main>
+                <!-- 首页的子路由匹配的页面的坑 -->
+                <router-view></router-view>
+            </el-main>
         </el-container>
     </el-container>
 </template>
