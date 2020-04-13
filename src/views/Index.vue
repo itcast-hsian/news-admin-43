@@ -47,7 +47,7 @@ export default {
 // 把最外层的el-container设置为100vh
 #app > .el-container {
     height: 100vh;
-    min-width: 1200px;
+    min-width: 1000px;
     min-height: 900px;
 }
 </style>

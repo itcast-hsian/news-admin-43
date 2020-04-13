@@ -13,8 +13,8 @@
             <span class="el-dropdown-link">
                 <!-- 用户信息 -->
                 <div class="user-actions">
-                    <img src="https://www.baidu.com/img/bd_logo1.png" />
-                    <span>用户信息</span>
+                    <img :src="$axios.defaults.baseURL + userInfo.user.head_img" />
+                    <span>{{ userInfo.user.nickname }}</span>
                 </div>
                 <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
@@ -28,6 +28,18 @@
 
 <script>
 export default {
+    data(){
+        return {
+            // 用户信息
+            userInfo: {
+                user: {}
+            }
+        }
+    },
+    mounted(){
+        // 获取本地用户信息的数据
+        this.userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+    },
     methods: {
         // 退出登录方法
         handleLogout(){
