@@ -25,7 +25,7 @@
                 <!-- 自定义模板 -->
                 <!-- scope.row表示这行的数据的对象，类似for循环里的item -->
                 <template slot-scope="scope">
-                    <el-button size="mini" type="danger">删除</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -96,7 +96,35 @@ export default {
 			this.pageIndex = val;
 			// 重新请求接口
 			this.getList();
-        }
+		},
+		// 删除的事件， item是当前点击的文章数据对象
+		handleDelete(item){
+			const {token} = JSON.parse(localStorage.getItem("userInfo"));
+
+			this.$confirm('此操作将永久删除该文章, 是否继续?', '提示', {
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				type: 'warning'
+			}).then(() => {
+				// 发起编辑的接口
+				this.$axios({
+					url: "/post_update/" + item.id,
+					method: "POST",
+					data: {
+						open: 0 // 表示关闭文章
+					},
+					headers: {
+						Authorization: token
+					}
+				}).then(res => {
+					const {message} = res.data;
+					// 提示用户编辑成功
+					this.$message.success(message);
+					// 重新请求当前的数据
+					this.getList();
+				})
+			})			
+		}
     }
 };
 </script>
