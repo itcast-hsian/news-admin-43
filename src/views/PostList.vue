@@ -1,37 +1,50 @@
 <template>
     <div>
         <!-- tableData 表格的数据，这个数据是由后台返回的 -->
-        <el-table :data="tableData" style="width: 100%">
+        <el-table :data="tableData" style="width: 100%; margin-bottom: 20px;">
             <!-- 表格的每一列 -->
             <!-- prop是当前这列的属性，展示出数据中每个对象的匹配的属性值 -->
             <el-table-column prop="title" label="标题" width="500"></el-table-column>
 
             <el-table-column label="类型" width="180">
-				<!-- 自定义模板，这个scope是一个对象 -->
-				<template slot-scope="scope">
-					<!-- scope.row表示这行的数据的对象，类似for循环里的item -->
-					{{scope.row.type === 1 ? '文章' : '视频' }}
-				</template>
-			</el-table-column>
+                <!-- 自定义模板，这个scope是一个对象 -->
+                <template slot-scope="scope">
+                    <!-- scope.row表示这行的数据的对象，类似for循环里的item -->
+                    {{scope.row.type === 1 ? '文章' : '视频' }}
+                </template>
+            </el-table-column>
 
             <el-table-column label="时间">
-				<!-- 使用自定义模板，通过moment来转换时间格式 -->
-				<template slot-scope="scope">
-					{{ moment(scope.row.create_date).format("YYYY-MM-DD hh:mm:ss") }}
-				</template>
-			</el-table-column>
+                <!-- 使用自定义模板，通过moment来转换时间格式 -->
+                <template
+                    slot-scope="scope"
+                >{{ moment(scope.row.create_date).format("YYYY-MM-DD hh:mm:ss") }}</template>
+            </el-table-column>
 
             <el-table-column label="操作">
-				<!-- 自定义模板 -->
-				<!-- scope.row表示这行的数据的对象，类似for循环里的item -->
+                <!-- 自定义模板 -->
+                <!-- scope.row表示这行的数据的对象，类似for循环里的item -->
                 <template slot-scope="scope">
-                    <el-button
-                        size="mini"
-                        type="danger"
-                    >删除</el-button>
+                    <el-button size="mini" type="danger">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
+
+        <!-- 分页组件 -->
+		<!-- size-change: 分页条数切换时候触发的事件 -->
+		<!-- current-change: 页数切换触发的事件 -->
+		<!-- current-page: 当前页数 -->
+		<!-- page-size：当前显示的条数 -->
+		<!-- total: 总条数 -->
+        <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageIndex"
+            :page-sizes="[5, 10, 15, 20]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+        ></el-pagination>
     </div>
 </template>
 
@@ -42,27 +55,38 @@ import moment from "moment";
 export default {
     data() {
         return {
-			// 表格数据
-			tableData: [],
-			moment
+            // 表格数据
+            tableData: [],
+			moment,
+			pageIndex: 1,
+			pageSize: 5,
+			total: 0
         };
-	},
-	mounted(){
-		// 请求文章列表
-		this.$axios({
-			url: "/post",
-			params: {
-				pageIndex: 1,
-				pageSize: 5,
-				category: 999 // 这个是固定，因为头条栏目会返回所有的文章
-			}
-		}).then(res => {
-			// data是文章的列表数据
-			const {data} = res.data;
-			// 保存数据到data
-			this.tableData = data;
-		})
-	}
+    },
+    mounted() {
+        // 请求文章列表
+        this.$axios({
+            url: "/post",
+            params: {
+                pageIndex: 1,
+                pageSize: 5,
+                category: 999 // 这个是固定，因为头条栏目会返回所有的文章
+            }
+        }).then(res => {
+            // data是文章的列表数据
+            const { data } = res.data;
+            // 保存数据到data
+            this.tableData = data;
+        });
+    },
+    methods: {
+        handleSizeChange(val) {
+            console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            console.log(`当前页: ${val}`);
+        }
+    }
 };
 </script>
 
