@@ -95,7 +95,7 @@ export default {
                 // 文章内容,  
                 // 如果是普通文章，这个值获取的是富文本编辑器里面的内容
                 // 如果是视频文章，这个值就获取上传视频成功后的链接
-                content: "<h1>Some initial content</h1>",
+                content: "",
                 // 栏目id的集合： [ {id: 1} ]
                 categories: [],
                 // 封面图片id的集合：[ {id: 1} ]
@@ -164,9 +164,39 @@ export default {
                 return {
                     id: v.response.data.id
                 }
+            });
+
+            // 验证表单数据
+            if(this.form.title.trim() === ""){
+                this.$message.warning("标题不能为空");
+                return;
+            }
+            if(this.form.content.trim() === ""){
+                this.$message.warning("内容不能为空");
+                return;
+            }
+            if(this.form.categories.length === 0){
+                this.$message.warning("栏目不能为空");
+                return;
+            }
+            if(this.form.cover.length === 0){
+                this.$message.warning("封面不能为空");
+                return;
+            }
+
+            // 发布普通的文章
+            this.$axios({
+                url: "/post",
+                method: 'POST',
+                data: this.form,
+                headers: {
+                    Authorization: this.token
+                }
+            }).then(res => {
+                const {message} = res.data;
+                // 弹窗提示
+                this.$message.success(message)
             })
-            
-            
 		}
     }
 };
