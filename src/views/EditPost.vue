@@ -66,6 +66,7 @@
 				handlePictureCardPreview: 图片预览的事件
                 handleRemove：移除图片的事件
                 on-success: 图片上传成功后的回调函数-->
+                <!-- file-list：上传的图片列表 -->
                 <el-upload
                     :action="$axios.defaults.baseURL + '/upload'"
                     :headers="{
@@ -75,6 +76,7 @@
                     :on-preview="handlePictureCardPreview"
                     :on-remove="handleImageRemove"
                     :on-success="handleImageSuccess"
+                    :file-list="fileList"
                 >
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -141,6 +143,25 @@ export default {
             data.splice(0, 1);
             // 保存到data
             this.menus = data;
+        });
+
+        // 获取url地址栏的动态id
+        const {id} = this.$route.params;
+        // 请求当前文章的数据
+        this.$axios({
+            url: "/post/" + id,
+        }).then(res => {
+            const {data} = res.data;
+            // 还原数据
+            this.form.title = data.title;
+            this.form.type = data.type;
+            this.form.content = data.content;
+            this.form.categories = data.categories.map(v => { return v.id });
+            // 封面图片的回显
+            this.fileList = data.cover.map(v => {
+                v.url = this.$axios.defaults.baseURL + v.url;
+                return v;
+            })
         })
     },
     methods: {
@@ -167,6 +188,7 @@ export default {
         handleImageSuccess(response, file, fileList){
             // 把当前的图片列表赋值给data
             this.fileList = fileList;
+            console.log(fileList)
         },
         // 富文本编辑的上传图片的事件
         handleImageAdded: function(file, Editor, cursorLocation, resetUploader) {
@@ -191,7 +213,7 @@ export default {
                 console.log(err);
             });
         },
-		// 发布文章的点击事件
+		// 确定编辑文章的点击事件
 		onSubmit(){
             // 转换下栏目的id数据格式 
             this.form.categories = this.form.categories.map(v => {
@@ -202,69 +224,32 @@ export default {
             // 封面图片
             this.form.cover = this.fileList.map(v => {
                 return {
-                    id: v.response.data.id
+                    // v.id是运来旧图片的数据，v.response.data.id新上传的图片的id
+                    id: v.id || v.response.data.id
                 }
             });
 
             // 验证表单数据 写法1
-            // if(this.form.title.trim() === ""){
-            //     this.$message.warning("标题不能为空");
-            //     return;
-            // }
-            // if(this.form.content.trim() === ""){
-            //     this.$message.warning("内容不能为空");
-            //     return;
-            // }
-            // if(this.form.categories.length === 0){
-            //     this.$message.warning("栏目不能为空");
-            //     return;
-            // }
-            // if(this.form.cover.length === 0){
-            //     this.$message.warning("封面不能为空");
-            //     return;
-            // }
+            if(this.form.title.trim() === ""){
+                this.$message.warning("标题不能为空");
+                return;
+            }
+            if(this.form.content.trim() === ""){
+                this.$message.warning("内容不能为空");
+                return;
+            }
+            if(this.form.categories.length === 0){
+                this.$message.warning("栏目不能为空");
+                return;
+            }
+            if(this.form.cover.length === 0){
+                this.$message.warning("封面不能为空");
+                return;
+            }
 
-            // 写法二
-            const rules = [
-                { 
-                    // 验证的值，如果是true表示不通过
-                    value: this.form.title.trim() === "",
-                    // 错误的提示信息
-                    message: "标题不能为空"
-                },{ 
-                    value: this.form.content.trim() === "",
-                    message: "内容不能为空"
-                },
-                { 
-                    value: this.form.categories.length === 0,
-                    message: "栏目不能为空"
-                },
-                { 
-                    value: this.form.cover.length === 0,
-                    message: "封面不能为空"
-                }
-            ]
-            // 先假设所有的验证都是通过的
-            let isvalid = true;
-
-            rules.forEach(v => {
-                // 只有要一个判断没通过，阻止后面的判断
-                if(!isvalid) return;
-                // 发现有不通过的判断
-                if(v.value == true){
-                    // 提示
-                    this.$message.warning(v.message);
-                    // 把通过的状态修改为false
-                    isvalid = false;
-                }
-            })
-            // 如果验证不通过，就直接返回
-            if(!isvalid) return;
-
-
-            // 发布普通的文章
+            // 编辑文章
             this.$axios({
-                url: "/post",
+                url: "/post_update/" + this.$route.params.id,
                 method: 'POST',
                 data: this.form,
                 headers: {
@@ -273,9 +258,9 @@ export default {
             }).then(res => {
                 const {message} = res.data;
                 // 弹窗提示
-                this.$message.success(message)
+                this.$message.success(message);
                 // 返回文章列表 
-                this.$router.replace("/post-list")
+                this.$router.replace("/post-list");
             })
 		}
     }
