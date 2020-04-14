@@ -32,12 +32,16 @@
                 <!-- limit：限制上传文件的数量 -->
                 <!-- on-remove：移除文件的事件 -->
                 <el-upload
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :action="$axios.defaults.baseURL + '/upload'"
+                    :headers="{
+                        Authorization: token
+                    }"
                     :limit="1"
-                    :on-remove="handleRemove"
+                    :on-remove="handleVideoRemove"
+                    :on-success="handleVideoSuccess"
                 >
                     <el-button size="small" type="primary">点击上传</el-button>
-                    <div slot="tip" class="el-upload__tip">只能上传mp4,avi文件，且不超过2m</div>
+                    <div slot="tip" class="el-upload__tip">只能上传mp4,avi文件</div>
                 </el-upload>
             </el-form-item>
 
@@ -140,8 +144,13 @@ export default {
     },
     methods: {
         // 视频移除的事件
-        handleRemove(file, fileList) {
-            console.log(file, fileList);
+        handleVideoRemove(file, fileList) {
+            console.log(fileList);
+        },
+        // 视频上传成功的事件
+        handleVideoSuccess(response, file, fileList){
+            // 视频文章的content只需要一个视频的链接
+            this.form.content = response.data.url;
         },
         // 预览图片的事件
         handlePictureCardPreview(file) {
