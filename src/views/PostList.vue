@@ -25,6 +25,9 @@
                 <!-- 自定义模板 -->
                 <!-- scope.row表示这行的数据的对象，类似for循环里的item -->
                 <template slot-scope="scope">
+					<router-link :to="`/edit-post/${scope.row.id}`">
+						<el-button size="mini">编辑</el-button>
+					</router-link>
                     <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>

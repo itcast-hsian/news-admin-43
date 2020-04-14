@@ -18,6 +18,11 @@ const routes = [
 			{
 				path: "new-post",
 				component: () => import("@/views/NewPost.vue")
+			},
+			// 编辑文章
+			{
+				path: "edit-post/:id",
+				component: () => import("@/views/EditPost.vue")
 			}
 		]
 	},
