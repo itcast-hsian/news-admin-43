@@ -17,7 +17,14 @@
 
             <!-- 富文本编辑器 -->
             <el-form-item label="内容" class="editor" v-if="form.type === 1">
-                <vue-editor v-model="form.content"></vue-editor>
+                <!-- useCustomImageHandler: 使用自定义的图片上传 -->
+                <!-- @image-added 点击上传图片按钮时候的事件 -->
+                <vue-editor
+                    id="editor"
+                    v-model="form.content"
+                    useCustomImageHandler
+                    @image-added="handleImageAdded"
+                ></vue-editor>
             </el-form-item>
 
             <el-form-item label="视频" v-if="form.type === 2">
@@ -38,11 +45,11 @@
             <el-form-item label="栏目">
                 <el-checkbox-group v-model="form.categories">
                     <!-- 循环展示出菜单的多选框 -->
-                    <el-checkbox 
-                    :label="item.id" 
-                    name="type"
-                    v-for="(item, index) in menus"
-                    :key="index"
+                    <el-checkbox
+                        :label="item.id"
+                        name="type"
+                        v-for="(item, index) in menus"
+                        :key="index"
                     >{{item.name}}</el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
@@ -150,6 +157,29 @@ export default {
         handleImageSuccess(response, file, fileList){
             // 把当前的图片列表赋值给data
             this.fileList = fileList;
+        },
+        // 富文本编辑的上传图片的事件
+        handleImageAdded: function(file, Editor, cursorLocation, resetUploader) {
+            var formData = new FormData();
+            // 参数"file"是接口需要的属性
+            formData.append("file", file);
+
+            this.$axios({
+                url: "/upload",
+                method: "POST",
+                data: formData,
+                headers: {
+                    Authorization: this.token
+                }
+            }).then(result => {
+                // 回显到页面的编辑器中
+                let url = result.data.data.url; // Get url from response
+                // 往编辑中插入刚刚上传成功的图片，第一个参数是编辑器获得焦点的地方，
+                Editor.insertEmbed(cursorLocation, "image", this.$axios.defaults.baseURL + url);
+                resetUploader();
+            }).catch(err => {
+                console.log(err);
+            });
         },
 		// 发布文章的点击事件
 		onSubmit(){
