@@ -52,12 +52,17 @@
                 <!-- action:  上传图片的地址
 				list-type: 图片上传组件使用图片列表布局
 				handlePictureCardPreview: 图片预览的事件
-                handleRemove：移除图片的事件-->
+                handleRemove：移除图片的事件
+                on-success: 图片上传成功后的回调函数-->
                 <el-upload
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :action="$axios.defaults.baseURL + '/upload'"
+                    :headers="{
+                        Authorization: token
+                    }"
                     list-type="picture-card"
                     :on-preview="handlePictureCardPreview"
                     :on-remove="handleImageRemove"
+                    :on-success="handleImageSuccess"
                 >
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -100,13 +105,18 @@ export default {
             dialogImageUrl: "",
             dialogVisible: false,
             // 栏目列表
-            menus: []
+            menus: [],
+            token: ""
         };
     },
     components: {
         VueEditor
     },
     mounted(){
+        // token
+        const {token} = JSON.parse(localStorage.getItem("userInfo"));
+        this.token = token;
+
         // 请求栏目数据
         this.$axios({
             url: "/category"
@@ -132,10 +142,21 @@ export default {
         handlePictureCardPreview(file) {
             this.dialogImageUrl = file.url;
             this.dialogVisible = true;
-		},
+        },
+        // 图片上传成功后的事件
+        handleImageSuccess(response, file, fileList){
+            console.log(response)
+        },
 		// 发布文章的点击事件
 		onSubmit(){
-			console.log(this.form)
+            // 转换下栏目的id数据格式
+            this.form.categories = this.form.categories.map(v => {
+                return {
+                    id: v
+                }
+            });
+
+            console.log(this.form)
 		}
     }
 };
