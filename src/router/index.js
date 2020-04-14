@@ -7,6 +7,7 @@ const routes = [
 	{
 		path: "/",
 		component: () => import("@/views/Index.vue"),
+		redirect: "/post-list",
 		children: [
 			// 文章列表
 			{

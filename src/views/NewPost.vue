@@ -205,23 +205,61 @@ export default {
                 }
             });
 
-            // 验证表单数据
-            if(this.form.title.trim() === ""){
-                this.$message.warning("标题不能为空");
-                return;
-            }
-            if(this.form.content.trim() === ""){
-                this.$message.warning("内容不能为空");
-                return;
-            }
-            if(this.form.categories.length === 0){
-                this.$message.warning("栏目不能为空");
-                return;
-            }
-            if(this.form.cover.length === 0){
-                this.$message.warning("封面不能为空");
-                return;
-            }
+            // 验证表单数据 写法1
+            // if(this.form.title.trim() === ""){
+            //     this.$message.warning("标题不能为空");
+            //     return;
+            // }
+            // if(this.form.content.trim() === ""){
+            //     this.$message.warning("内容不能为空");
+            //     return;
+            // }
+            // if(this.form.categories.length === 0){
+            //     this.$message.warning("栏目不能为空");
+            //     return;
+            // }
+            // if(this.form.cover.length === 0){
+            //     this.$message.warning("封面不能为空");
+            //     return;
+            // }
+
+            // 写法二
+            const rules = [
+                { 
+                    // 验证的值，如果是true表示不通过
+                    value: this.form.title.trim() === "",
+                    // 错误的提示信息
+                    message: "标题不能为空"
+                },{ 
+                    value: this.form.content.trim() === "",
+                    message: "内容不能为空"
+                },
+                { 
+                    value: this.form.categories.length === 0,
+                    message: "栏目不能为空"
+                },
+                { 
+                    value: this.form.cover.length === 0,
+                    message: "封面不能为空"
+                }
+            ]
+            // 先假设所有的验证都是通过的
+            let isvalid = true;
+
+            rules.forEach(v => {
+                // 只有要一个判断没通过，阻止后面的判断
+                if(!isvalid) return;
+                // 发现有不通过的判断
+                if(v.value == true){
+                    // 提示
+                    this.$message.warning(v.message);
+                    // 把通过的状态修改为false
+                    isvalid = false;
+                }
+            })
+            // 如果验证不通过，就直接返回
+            if(!isvalid) return;
+
 
             // 发布普通的文章
             this.$axios({
@@ -235,6 +273,8 @@ export default {
                 const {message} = res.data;
                 // 弹窗提示
                 this.$message.success(message)
+                // 返回文章列表 
+                this.$router.replace("/post-list")
             })
 		}
     }
