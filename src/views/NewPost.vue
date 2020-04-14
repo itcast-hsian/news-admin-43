@@ -10,17 +10,17 @@
             里面的特殊资源-->
             <el-form-item label="类型">
                 <el-radio-group v-model="form.type">
-                    <el-radio label="文章"></el-radio>
-                    <el-radio label="视频"></el-radio>
+                    <el-radio :label="1">文章</el-radio>
+                    <el-radio :label="2">视频</el-radio>
                 </el-radio-group>
             </el-form-item>
 
             <!-- 富文本编辑器 -->
-            <el-form-item label="内容" class="editor">
+            <el-form-item label="内容" class="editor" v-if="form.type === 1">
                 <vue-editor v-model="form.content"></vue-editor>
             </el-form-item>
 
-            <el-form-item label="视频">
+            <el-form-item label="视频" v-if="form.type === 2">
                 <!-- action：上传链接 -->
                 <!-- limit：限制上传文件的数量 -->
                 <!-- on-remove：移除文件的事件 -->
@@ -36,11 +36,14 @@
 
             <!-- 多选框 -->
             <el-form-item label="栏目">
-                <el-checkbox-group v-model="form.category">
-                    <el-checkbox label="A" name="type"></el-checkbox>
-                    <el-checkbox label="B" name="type"></el-checkbox>
-                    <el-checkbox label="C" name="type"></el-checkbox>
-                    <el-checkbox label="D" name="type"></el-checkbox>
+                <el-checkbox-group v-model="form.categories">
+                    <!-- 循环展示出菜单的多选框 -->
+                    <el-checkbox 
+                    :label="item.id" 
+                    name="type"
+                    v-for="(item, index) in menus"
+                    :key="index"
+                    >{{item.name}}</el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
 
@@ -81,18 +84,40 @@ export default {
         return {
             // 表单的数据对象
             form: {
+                // 标题
                 title: "",
                 type: 1,
+                // 文章内容,  
+                // 如果是普通文章，这个值获取的是富文本编辑器里面的内容
+                // 如果是视频文章，这个值就获取上传视频成功后的链接
                 content: "<h1>Some initial content</h1>",
-                category: []
+                // 栏目id的集合： [ {id: 1} ]
+                categories: [],
+                // 封面图片id的集合：[ {id: 1} ]
+                cover: []
             },
             // 图片预览要使用的属性
             dialogImageUrl: "",
-            dialogVisible: false
+            dialogVisible: false,
+            // 栏目列表
+            menus: []
         };
     },
     components: {
         VueEditor
+    },
+    mounted(){
+        // 请求栏目数据
+        this.$axios({
+            url: "/category"
+        }).then(res => {
+            // data是栏目的数据
+            const {data} = res.data;
+            // 不需要头条的
+            data.splice(0, 1);
+            // 保存到data
+            this.menus = data;
+        })
     },
     methods: {
         // 视频移除的事件
@@ -110,7 +135,7 @@ export default {
 		},
 		// 发布文章的点击事件
 		onSubmit(){
-			console.log("submit")
+			console.log(this.form)
 		}
     }
 };
