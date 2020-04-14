@@ -170,7 +170,7 @@ export default {
             console.log(fileList);
         },
         // 视频上传成功的事件
-        handleVideoSuccess(response, file, fileList){
+        handleVideoSuccess(response, file, fileL1ist){
             // 视频文章的content只需要一个视频的链接
             this.form.content = response.data.url;
         },
