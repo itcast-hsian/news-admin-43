@@ -106,7 +106,9 @@ export default {
             dialogVisible: false,
             // 栏目列表
             menus: [],
-            token: ""
+            token: "",
+            // 图片上传的列表
+            fileList: []
         };
     },
     components: {
@@ -134,29 +136,37 @@ export default {
         handleRemove(file, fileList) {
             console.log(file, fileList);
         },
-        // 封面图片移除的事件
-        handleImageRemove(file, fileList) {
-            console.log(file, fileList);
-        },
         // 预览图片的事件
         handlePictureCardPreview(file) {
             this.dialogImageUrl = file.url;
             this.dialogVisible = true;
         },
+        // 封面图片移除的事件
+        handleImageRemove(file, fileList) {
+            // 把当前的图片列表赋值给data
+            this.fileList = fileList;
+        },
         // 图片上传成功后的事件
         handleImageSuccess(response, file, fileList){
-            console.log(response)
+            // 把当前的图片列表赋值给data
+            this.fileList = fileList;
         },
 		// 发布文章的点击事件
 		onSubmit(){
-            // 转换下栏目的id数据格式
+            // 转换下栏目的id数据格式 
             this.form.categories = this.form.categories.map(v => {
                 return {
                     id: v
                 }
             });
-
-            console.log(this.form)
+            // 封面图片
+            this.form.cover = this.fileList.map(v => {
+                return {
+                    id: v.response.data.id
+                }
+            })
+            
+            
 		}
     }
 };
